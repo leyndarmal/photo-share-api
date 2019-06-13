@@ -1,119 +1,45 @@
-// 1. Require 'apollo-server'
-const { ApolloServer } = require('apollo-server')
+const { ApolloServer } = require('apollo-server-express')
+const express = require('express')
+const expressPlayground = require('graphql-playground-middleware-express').default
+const { readFileSync } = require('fs')
+const { MongoClient } = require('mongodb')
+require('dotenv').config()
+const typeDefs = readFileSync('./typeDefs.graphql', 'UTF-8')
+const resolvers = require('./resolvers')
 
+// 1. Create Asynchronous Function
+async function start() {
+    const app = express()
+    const MONGO_DB = process.env.DB_HOST
 
-var users = [
-    { "githubLogin": "mHattrup", "name": "Mike Hattrup" },
-    { "githubLogin": "gPlake", "name": "Glen Plake" },
-    { "githubLogin": "sSchmidt", "name": "Scot Schmidt" }
-]
+    const client = await MongoClient.connect(
+        MONGO_DB,
+        { useNewUrlParser: true }
+    )
+    const db = client.db()
 
-var photos = [
-    {
-        "id": "1",
-        "name": "Dropping the Heart Chute",
-        "description": "The heart chute is one of my favorite chutes",
-        "category": "ACTION",
-        "githubUser": "gPlake"
-    },
-    {
-        "id": "2",
-        "name": "Enjoying the sunshine",
-        "category": "SELFIE",
-        "githubUser": "sSchmidt"
-    },
-    {
-        id: "3",
-        "name": "Gunbarrel 25",
-        "description": "25 laps on gunbarrel today",
-        "category": "LANDSCAPE",
-        "githubUser": "sSchmidt"
-    }
-]
-
-const typeDefs = `
-
-  # 1. Add Photo type definition
-
-  enum PhotoCategory {
-    SELFIE
-    PORTRAIT
-    ACTION
-    LANDSCAPE
-    GRAPHIC
-  }
-
-  type User {
-    githubLogin: ID!
-    name: String
-    avatar: String
-    postedPhotos: [Photo!]!
-  }
-
-    type Photo {
-      id: ID!
-      url: String!
-      name: String!
-      description: String
-      category: PhotoCategory!
-      postedBy: User!
-    }
-
-    input PostPhotoInput {
-        name: String!
-        category: PhotoCategory=PORTRAIT
-        description: String
-      }
-
-  # 2. Return Photo from allPhotos
-    type Query {
-      totalPhotos: Int!
-      allPhotos: [Photo!]!
-    }
-
-  # 3. Return the newly posted photo from the mutation
-    type Mutation {
-        postPhoto(input: PostPhotoInput!): Photo!
-    }
-`
-
-const resolvers = {
-    Query: {
-        totalPhotos: () => photos.length,
-        allPhotos: () => photos
-    },
-    Mutation: {
-        postPhoto(parent, args) {
-            var newPhoto = {
-                id: _id++,
-                ...args.input
-            }
-            photos.push(newPhoto)
-            return newPhoto
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: async ({ req }) => {
+            const githubToken = req.headers.authorization
+            const currentUser = await db.collection('users').findOne({ githubToken })
+            return { db, currentUser }
         }
-    },
-    Photo: {
-        url: parent => `http://yoursite.com/img/${parent.id}.jpg`,
-        postedBy: parent => {
-            return users.find(u => u.githubLogin === parent.githubUser)
-        }
-    },
-    User: {
-        postedPhotos: parent => {
-            return photos.filter(p => p.githubUser === parent.githubLogin)
-        }
-    }
+    })
+
+    server.applyMiddleware({ app })
+
+    app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'))
+
+    app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
+
+    app.listen({ port: 4000 }, () =>
+        console.log(
+            `GraphQL Server running at http://localhost:4000${server.graphqlPath}`
+        )
+    )
 }
 
-// 2. Create a new instance of the server.
-// 3. Send it an object with typeDefs (the schema) and resolvers
-const server = new ApolloServer({
-    typeDefs,
-    resolvers
-})
-
-
-// 4. Call listen on the server to launch the web server
-server
-    .listen()
-    .then(({ url }) => console.log(`GraphQL Service running on ${url}`))
+// 5. Invoke start when ready to start
+start()
