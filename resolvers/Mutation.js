@@ -24,6 +24,27 @@ module.exports = {
 
     },
 
+    async postFlight(parent, args, { db, currentUser }) {
+
+        // 1. If there is not a user in context, throw an error
+        if (!currentUser) {
+            throw new Error('only an authorized user can post flights')
+        }
+
+        // 2. Save the current user's id with the flight
+        const newFlight = {
+            ...args.input,
+            userID: currentUser.githubLogin,
+            created: new Date()
+        }
+
+        // 3. Insert the new flight, capture the id that the database created
+        const { insertedIds } = await db.collection('flights').insert(newFlight)
+        newPhoto.id = insertedIds[0]
+
+        return newFlight
+    },
+
 
 
     async githubAuth(parent, { code }, { db }) {

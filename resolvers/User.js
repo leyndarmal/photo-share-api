@@ -1,8 +1,9 @@
 module.exports = {
 
-    postedPhotos: parent => {
-        return photos.filter(p => p.githubUser === parent.githubLogin)
-    },
+    postedPhotos: (parent, args, { db }) =>
+        db.collection("photos")
+            .find({ userID: parent.githubLogin })
+            .toArray(),
 
     inPhotos: parent => tags
 

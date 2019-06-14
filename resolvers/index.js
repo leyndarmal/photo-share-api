@@ -2,6 +2,8 @@ const Query = require('./Query')
 const Mutation = require('./Mutation')
 const User = require('./User')
 const Photo = require('./Photo')
+const Flight = require('./Flight')
+
 
 
 const { GraphQLScalarType } = require('graphql')
@@ -11,6 +13,7 @@ const resolvers = {
   Mutation,
   Photo,
   User,
+  Flight,
   DateTime: new GraphQLScalarType({
     name: 'DateTime',
     description: 'A valid date time value.',

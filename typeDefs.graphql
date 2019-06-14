@@ -15,6 +15,16 @@ type User {
   avatar: String
   postedPhotos: [Photo!]!
   inPhotos: [Photo!]!
+  postedFlights: [Flight!]!
+}
+
+type Flight {
+  origin: String!
+  destination: String!
+  price: Int!
+  carryOn: Boolean!
+  postedBy: User!
+  created: DateTime!
 }
 
 type Photo {
@@ -39,10 +49,19 @@ input PostPhotoInput {
   description: String
 }
 
+input PostFlightInput {
+  origin: String!
+  destination: String!
+  price: Int!
+  carryOn: Boolean!
+}
+
 # 2. Return Photo from allPhotos
 type Query {
    me: User
   totalPhotos: Int!
+  totalFlights: Int!
+  allFlights: [Flight!]!
   allPhotos: [Photo!]!
   totalUsers: Int!
   allUsers: [User!]!
@@ -52,6 +71,7 @@ type Query {
 type Mutation {
   postPhoto(input: PostPhotoInput!): Photo!
   githubAuth(code: String!): AuthPayload!
-   addFakeUsers(count: Int = 1): [User!]!
-   fakeUserAuth(githubLogin: ID!): AuthPayload!
+  addFakeUsers(count: Int = 1): [User!]!
+  fakeUserAuth(githubLogin: ID!): AuthPayload!
+  postFlight(input: PostFlightInput!): Flight!
 }
