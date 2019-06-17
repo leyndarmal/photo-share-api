@@ -1,6 +1,19 @@
-PhotoShare API
-===========
 
+<h1 align="center">
+   photo-share-api
+</h1>
+
+<h4 align="center">GraphQL service</a>.</h4>
+
+<p align="center">
+  <a href="#about">About</a> 
+</p>
+
+
+## About
+
+* This service is a GraphQL api, for a photo sharing example app (guided by "Learning GraphQL" book)
+* In order to run it:
 1. Run `npm install` on this folder.
 2. Replace the values of the `.env` file with your unique variables. 
 
@@ -10,5 +23,7 @@ CLIENT_ID=<YOUR_GITHUB_CLIENT_ID>
 CLIENT_SECRET=<YOUR_GITHUB_CLIENT_SECRET>
 ```
 3. Run `npm start` and open your browser to `http://localhost:4000/playground`.
+
+
 
 
