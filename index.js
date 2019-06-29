@@ -11,11 +11,8 @@ const resolvers = require('./resolvers')
 async function start() {
     const app = express()
     const MONGO_DB = process.env.DB_HOST
-
-    const client = await MongoClient.connect(
-        MONGO_DB,
-        { useNewUrlParser: true }
-    )
+    const dbUrl = `mongodb://leyndarmal:${encodeURIComponent('password')}@18.223.143.245:27017/flightsDB`;
+    const client = await MongoClient.connect(dbUrl )
     const db = client.db()
 
     const server = new ApolloServer({
