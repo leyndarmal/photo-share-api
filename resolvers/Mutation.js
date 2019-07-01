@@ -19,9 +19,7 @@ module.exports = {
         // 3. Insert the new photo, capture the id that the database created
         const { insertedIds } = await db.collection('photos').insert(newPhoto)
         newPhoto.id = insertedIds[0]
-
         return newPhoto
-
     },
 
     async postFlight(parent, args, { db, currentUser }) {

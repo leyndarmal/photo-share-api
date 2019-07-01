@@ -58,7 +58,7 @@ input PostFlightInput {
 
 # 2. Return Photo from allPhotos
 type Query {
-   me: User
+  me: User
   totalPhotos: Int!
   totalFlights: Int!
   allFlights: [Flight!]!
