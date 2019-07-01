@@ -11,7 +11,8 @@ const resolvers = require('./resolvers')
 async function start() {
     const app = express()
     const MONGO_DB = process.env.DB_HOST
-    const dbUrl = `mongodb://leyndarmal:${encodeURIComponent('password')}@18.223.143.245:27017/flightsDB`;
+    //should be taken from env variable
+    const dbUrl = `mongodb://leyndarmal:${encodeURIComponent('mypassword')}@18.223.143.245:27017/flightsDB`;
     const client = await MongoClient.connect(dbUrl )
     const db = client.db()
 
@@ -31,9 +32,9 @@ async function start() {
 
     app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
 
-    app.listen({ port: 4000 }, () =>
+    app.listen({ port: 3000 }, () =>
         console.log(
-            `GraphQL Server running at http://localhost:4000${server.graphqlPath}`
+            `GraphQL Server running on aws url, port 3000${server.graphqlPath}`
         )
     )
 }
